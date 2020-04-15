@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+ 	  xmlns:h="http://xmlns.jcp.org/jsf/html"
+ 	  xmlns:f="http://xmlns.jcp.org/jsf/core"
+	  xmlns:p="http://primefaces.org/ui"
+	  xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<h:head>
+
+<meta charset="UTF-8"/>
+<title>Endereços dos alunos</title>
+
+<style type="text/css"> @import url(#{facesContext.externalContext.request.contextPath}/resource/css/estilo-gestao-notas-aluno.css) </style>
+
+<f:metadata>
+	<f:viewAction action="#{enderecoAlunoController.todosAlunos}" />
+</f:metadata>
+
+</h:head>
+
+<h:body>
+	<header>
+		<h1>Endereços dos alunos</h1>
+	</header>
+
+	
+	
+	<h:form>
+		
+		<p:messages id="messages" autoUpdate="true" />
+	
+		<p:toolbar id="toolbar">
+			<f:facet name="left">
+				<p:inputText id="termoPesquisa" placeholder="Digite aqui um termo para pesquisa..." 
+					size="30" value="#{enderecoAlunoController.pesquisaTermo}"/>
+				
+				<p:commandButton value="Pesquisar" icon="fa fa-search"
+					actionListener="#{enderecoAlunoController.pesquisarAluno}" update="alunosDataTable messages"
+					process="@this termoPesquisa"/>
+	            
+				<span class="ui-separator">
+	                <span class="ui-icon ui-icon-grip-dotted-vertical" />
+	            </span>
+	           
+	         </f:facet>
+		</p:toolbar>
+		
+		<p:spacer height="20px" />
+	
+	
+		<p:carousel id="alunosDataTable" value="#{enderecoAlunoController.listaAlunos}" headerText="Responsive" var="aluno" itemStyle="text-align:center" responsive="true">
+        <p:panelGrid columns="2" style="width:100%;margin:10px 0px" columnClasses="label,value" layout="grid" styleClass="ui-panelgrid-blank">
+            <f:facet name="header">
+               <h:outputText value="#{aluno.nome}" />
+            </f:facet>
+ 
+            <h:outputText value="Sobrenome:" />
+            <h:outputText value="#{aluno.sobrenome}" />
+ 
+            <h:outputText value="Rua:" />
+            <h:outputText value="#{aluno.endereco.rua}" />
+            
+            <h:outputText value="Cep:" />
+            <h:outputText value="#{aluno.endereco.cep}" />
+            
+            <h:outputText value="Bairro:" />
+            <h:outputText value="#{aluno.endereco.bairro}" />
+            
+            <h:outputText value="Número:" />
+            <h:outputText value="#{aluno.endereco.numero}" />
+            
+            <h:outputText value="Cidade:" />
+            <h:outputText value="#{aluno.endereco.cidade.descricaoCidade}" />
+            
+            <h:outputText value="Estado:" />
+            <h:outputText value="#{aluno.endereco.cidade.estado.descricao}" />
+       
+       </p:panelGrid>
+    </p:carousel>
+	</h:form>
+	
+	
+	<h:form>
+	
+	<p>
+		<p:commandButton value="Voltar"
+			action="menu?faces-redirect=true" />
+	</p>
+	
+	</h:form>
+	
+	
+</h:body>
+
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+ 	  xmlns:h="http://xmlns.jcp.org/jsf/html"
+ 	  xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<h:head>
+
+<meta charset="UTF-8"/>
+<title>Gestão Aluno</title>
+
+<style type="text/css"> @import url(#{facesContext.externalContext.request.contextPath}/resource/css/estilo-gestao-aluno.css) </style>
+
+</h:head>
+
+<h:body>
+	<header>
+		<h1>Cadastro de alunos</h1>
+	</header>	
+	
+	<div id="conteudo">
+		<f:metadata>
+			<f:viewAction action="#{gestaoAlunoController.todosAlunos}" />
+		</f:metadata>
+	
+	<h:form id="frm">
+	
+		<p:confirmDialog global="true">
+			<p:commandButton value="Não" icon="fa fa-remove"
+				styleClass="ui-confirmdialog-no"/>
+			<p:commandButton value="Sim" icon="fa fa-check"
+				styleClass="ui-confirmdialog-yes"/>
+		</p:confirmDialog>
+
+		<p:messages id="messages"/>
+	
+		<p:toolbar id="toolbar">
+			<f:facet name="left">
+				<p:inputText id="termoPesquisa" placeholder="Digite aqui um termo para pesquisa..." 
+					size="30" value="#{gestaoAlunoController.pesquisaTermo}"/>
+				
+				<p:commandButton value="Pesquisar" icon="fa fa-search"
+					actionListener="#{gestaoAlunoController.pesquisarAluno}" update="alunosDataTable messages"
+					process="@this termoPesquisa"/>
+				
+				<span class="ui-separator">
+	                <span class="ui-icon ui-icon-grip-dotted-vertical" />
+	            </span>
+	            
+	            <p:commandButton value="Nova" icon="fa fa-plus"
+	            	actionListener="#{gestaoAlunoController.prepararNovoAluno}" 
+	            	oncomplete="PF('alunoDialogWidgetVar').show()"
+	            	update="alunoDialog" process="@this">
+	            	<p:resetInput target="alunoDialog" />	
+            	</p:commandButton>
+	            
+				<span class="ui-separator">
+	                <span class="ui-icon ui-icon-grip-dotted-vertical" />
+	            </span>
+	            
+	            <p:commandButton title="Editar" icon="fa fa-edit" 
+	            	disabled="#{not gestaoAlunoController.alunoSelecionada}" 
+	            	actionListener="#{gestaoAlunoController.edicao}"
+	            	oncomplete="PF('alunoDialogWidgetVar').show()"
+	            	update="alunoDialog" process="@this">
+	            	<p:resetInput target="alunoDialog" />
+	            		
+	            </p:commandButton>
+	            
+	            <p:commandButton title="Excluir" icon="fa fa-trash" 
+	            	disabled="#{not gestaoAlunoController.alunoSelecionada}"
+	            	actionListener="#{gestaoAlunoController.excluir}"
+	            	update="messages alunosDataTable toolbar" process="@this">
+	            	
+	            	<p:confirm icon="ui icon-alert" header="Confirmação de exclusão" message="Posso excluir o aluno?" />
+	            
+	            	
+	           	</p:commandButton>
+	            
+				<span class="ui-separator">
+	                <span class="ui-icon ui-icon-grip-dotted-vertical" />
+	            </span>
+	            
+	            <p:commandButton title="Exportar para o Excel" icon="fa fa-file-excel-o"
+	            	ajax="false">
+	            	<p:dataExporter type="xls" target="alunosDataTable" fileName="Alunos"/>
+	            </p:commandButton>		
+			</f:facet>
+		</p:toolbar>
+		
+		<p:spacer height="20px" />
+		
+		<p:dataTable id="alunosDataTable" value="#{gestaoAlunoController.listaAlunos}"
+			var="aluno" emptyMessage="Nenhuma informação a ser exibida"
+			paginator="true" rows="10" paginatorPosition="bottom"
+			selectionMode="single" selection="#{gestaoAlunoController.aluno}" rowKey="#{aluno.id}">
+			
+			<p:ajax event="rowSelect" update="frm:toolbar" />
+			
+			<p:ajax event="rowUnselect" update="frm:toolbar" />
+			
+			<p:column headerText="Nome" sortBy="#{aluno.nome}">
+				<h:outputText value="#{aluno.nome}" />
+			</p:column>
+			
+			<p:column headerText="Sobrenome">
+				<h:outputText value="#{aluno.sobrenome}" />
+			</p:column>
+			
+			<p:column headerText="CPF">
+				<h:outputText value="#{aluno.cpf}" />
+			</p:column>
+			
+			<p:column headerText="Email">
+				<h:outputText value="#{aluno.email}" />
+			</p:column>
+			
+			<p:column headerText="Sexo">
+				<h:outputText value="#{aluno.sexo}" />
+			</p:column>
+			
+			<p:column headerText="Telefone">
+				<h:outputText value="#{aluno.telefone.descricaoTelefone}" />
+			</p:column>
+			
+			<p:column headerText="Telefone">
+				<h:outputText value="#{aluno.telefone.tipoTelefone}" />
+			</p:column>
+		</p:dataTable>
+		
+		<p:dialog id="alunoDialog" header="Novo aluno" widgetVar="alunoDialogWidgetVar"
+			modal="true" resizable="false" closeOnEscape="true" height="350">
+			
+			<p:messages id="alunoMessages" />
+			
+			<p:defaultCommand target="salvarCommandButton" scope="alunoDialog" />
+		
+			<h:panelGrid id="alunoPanelGrid" columns="2"
+				rendered="#{gestaoAlunoController.aluno ne null}">
+				
+				<p:outputLabel value="Nome : " for="nome" />
+				<p:inputText id="nome" size="80" maxlength="120" 
+					value="#{gestaoAlunoController.aluno.nome}" />
+				
+				<p:outputLabel value="Sobrenome : " for="sobrenome" />
+				<p:inputText id="sobrenome" size="80" maxlength="80" 
+					value="#{gestaoAlunoController.aluno.sobrenome}"/>
+				
+				<p:outputLabel value="Cpf :  " for="cpf" />
+				<p:inputMask id="cpf" mask="999.999.999-99" size="14" maxlength="14"
+					value="#{gestaoAlunoController.aluno.cpf}"/>
+					
+				<p:outputLabel value="Email : " for="email" />
+				<p:inputText id="email" size="80" maxlength="80" 
+					value="#{gestaoAlunoController.aluno.email}"/>
+					
+				<p:outputLabel value="Sexo : " for="sexo" />
+				<p:selectOneMenu id="sexo" value="#{gestaoAlunoController.aluno.sexo}">
+					<f:selectItem itemLabel="Selecione..." />
+					<f:selectItems value="#{gestaoAlunoController.sexo}" 
+						var="sexo" itemLabel="#{sexo.descricao}"
+						itemValue="#{sexo}"/>
+				</p:selectOneMenu>
+				
+				<p:outputLabel value="Tipo de telefone : " for="tipo" />
+				<p:selectOneMenu id="tipo" value="#{gestaoAlunoController.aluno.telefone.tipoTelefone}">
+					<f:selectItem itemLabel="Selecione..." />
+					<f:selectItems value="#{gestaoAlunoController.tipo}" 
+						var="tipo" itemLabel="#{tipo.descricao}"
+						itemValue="#{tipo}"/>
+				</p:selectOneMenu>
+					
+				<p:outputLabel value="Telefone : " for="telefone" />
+				<p:inputMask id="telefone" mask="(99) 9999-9999" size="14" maxlength="14"
+					value="#{gestaoAlunoController.aluno.telefone.descricaoTelefone}"/>
+					
+				<p:outputLabel value="Cep : " for="cep" />
+				<p:inputMask id="cep" mask="99999-999" size="9" maxlength="9"
+					value="#{gestaoAlunoController.aluno.endereco.cep}"/>
+				
+				<p:outputLabel value="Rua : " for="rua" />
+				<p:inputText id="rua" size="80" maxlength="120" 
+					value="#{gestaoAlunoController.aluno.endereco.rua}"/>
+					
+				<p:outputLabel value="Bairro : " for="bairro" />
+				<p:inputText id="bairro" size="80" maxlength="120" 
+					value="#{gestaoAlunoController.aluno.endereco.bairro}"/>
+					
+				<p:outputLabel value="Número : " for="numero" />
+				<p:inputText id="numero" size="80" maxlength="120" 
+					value="#{gestaoAlunoController.aluno.endereco.numero}"/>
+
+				<p:outputLabel value="Cidade : " for="cidade" />
+				<p:inputText id="cidade" size="80" maxlength="120" 
+					value="#{gestaoAlunoController.aluno.endereco.cidade.descricaoCidade}"/>		
+					
+				<p:outputLabel value="Estado : " for="estado" />
+				<p:selectOneMenu id="estado" value="#{gestaoAlunoController.aluno.endereco.cidade.estado}">
+					<f:selectItem itemLabel="Selecione..." />
+					<f:selectItems value="#{gestaoAlunoController.estado}" 
+						var="estado" itemLabel="#{estado.descricao}"
+						itemValue="#{estado}"/>
+				</p:selectOneMenu>			
+				
+				
+				
+				<h:outputLabel />
+				<p:commandButton id="salvarCommandButton" value="Salvar" actionListener="#{gestaoAlunoController.salvar}"
+					update="alunoPanelGrid alunoMessages"
+					oncomplete="if (!args.validationFailed) PF('alunoDialogWidgetVar').hide()" process="alunoDialog"/>
+			</h:panelGrid>
+			
+		</p:dialog>
+		
+	</h:form>
+	</div>
+	
+	<h:form>
+	
+	<p>
+		<p:commandButton value="Voltar"
+			action="menu?faces-redirect=true" />
+	</p>
+	
+	</h:form>
+	
+
+
+</h:body>
+
+</html>
